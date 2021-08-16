@@ -1,0 +1,3 @@
+This is the result for the trunk-less motorized model. It was obtained with parameters initialized to a previous result (see NoTrunk_m_G_opti+soleus_3_final.par file) that we tried to improve by modifying the controller.
+
+The scenario is the config.scone file. The model and the initial pose of the model of the scenario are defined by other files that are also present in this file (gait14dof22musc_NoTrunk_HAdd_DPelvComp.osim and InitStateGait10.sto).

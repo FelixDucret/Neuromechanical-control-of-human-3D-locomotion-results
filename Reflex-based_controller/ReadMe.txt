@@ -1,0 +1,3 @@
+This is the result for the reflex-based gait controller. It was obtained with parameters initialized to a previous result (see Lumbar_Joints_NoPelvisPD_21_final.par file) that we tried to improve by modifying the controller.
+
+The scenario is the config.scone file. Some measures, the model and the initial pose of the model of the scenario are defined by other files that are also present in this file (ScriptMeasure_zDeviation.lua, gait14dof22musc_2LumbarJoints_HAdd_DPelvComp.osim, InitStateGait10.sto).

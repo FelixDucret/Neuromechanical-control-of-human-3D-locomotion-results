@@ -1,0 +1,233 @@
+CmaOptimizer {
+	signature_prefix = DATE_TIME
+	lambda = 40
+	init_file = "data/NoTrunk_m_G_opti+soleus_3_final.par"
+	use_init_file = true
+	use_init_file_std = false
+	SimulationObjective {
+		max_duration = 10
+		ModelOpenSim3 {
+			model_file = "data/gait14dof22musc_NoTrunk_HAdd_DPelvComp.osim"
+			state_init_file = "data/InitStateGait10.sto"
+			initial_state_offset = "0~0.01<-0.5,0.5>"
+			initial_state_offset_exclude = *_tx;*_ty;*_u
+			enable_external_forces = 1
+		}
+		CompositeController {
+			GaitStateController {
+				signature_postfix = GH_KneeOng
+				stance_load_threshold = "~0.1<0.001,1>"
+				leg_load_sensor_delay = 0
+				symmetric = 1
+				ConditionalControllers {
+					ConditionalController {
+						states = "EarlyStance LateStance Liftoff Swing Landing"
+						ReflexController {
+							MuscleReflex {
+								target = tib_ant
+								delay = 0.020
+								KL = "~1.1<-10,10>"
+								L0 = "~0.71<0,2>"
+							}
+							MuscleReflex {
+								target = tib_ant
+								source = soleus
+								delay = 0.020
+								KF = "~-0.3<-10,10>"
+							}
+						}
+					}
+					ConditionalController {
+						states = "LateStance Liftoff"
+						ReflexController {
+							MuscleReflex {
+								target = soleus
+								delay = 0.020
+								KF = "~1.2<0,10>"
+							}
+						}
+					}
+					ConditionalController {
+						states = "EarlyStance LateStance Liftoff"
+						ReflexController {
+							MuscleReflex {
+								target = gastroc
+								delay = 0.020
+								KF = "~1.1<-10,10>"
+							}
+						}
+					}
+					ConditionalController {
+						states = "EarlyStance LateStance"
+						ReflexController {
+							Reflexes {
+								ConditionalMuscleReflex {
+									target = vasti
+									delay = 0.010
+									KF = "~1.15<-10,10>"
+									C0 = "~0.09<-1,1>"
+									dof = knee_angle
+									pos_max = "~-0.175<-1,0>"
+								}
+								DofReflex {
+									target = hamstrings
+									source = pelvis_tilt
+									delay = 0.005
+									KP = "~1.91<-10,10>"
+									KV = "~0.25<-10,10>"
+									P0 = -0.105
+									C0 = "~0.05<-1,1>"
+								}
+								DofReflex {
+									target = glut_max
+									source = pelvis_tilt
+									delay = 0.005
+									KP = "~1.91<-10,10>"
+									KV = "~0.25<-10,10>"
+									P0 = -0.105
+									C0 = "~0.05<-1,1>"
+								}
+								DofReflex {
+									target = iliopsoas
+									source = pelvis_tilt
+									delay = 0.005
+									KP = "~-1.91<-10,10>"
+									KV = "~-0.25<-10,10>"
+									P0 = -0.105
+									C0 = "~0.05<-1,1>"
+								}
+							}
+						}
+					}
+					ConditionalController {
+						states = Liftoff
+						ReflexController {
+							MuscleReflex {
+								target = iliopsoas
+								delay = 0.005
+								C0 = "~0.25<-1,1>"
+							}
+							MuscleReflex {
+								target = glut_max
+								delay = 0.005
+								C0 = "~-0.25<-1,1>"
+							}
+							MuscleReflex {
+								target = rect_fem
+								delay = 0.010
+								KL = "~0.4<0,10>"
+								L0 = "~1<0,2>"
+							}
+						}
+					}
+					ConditionalController {
+						states = Swing
+						ReflexController {
+							MuscleReflex {
+								target = bifemsh
+								delay = 0.010
+								KL = "~1.5<-10,10>"
+								L0 = "~1<0,2>"
+							}
+						}
+					}
+					ConditionalController {
+						states = "Swing Landing"
+						ReflexController {
+							MuscleReflex {
+								target = iliopsoas
+								delay = 0.005
+								KL = "~0.35<-10,10>"
+								L0 = "~0.6<0,2>"
+							}
+							DofReflex {
+								target = iliopsoas
+								source = pelvis_tilt
+								delay = 0.005
+								KP = "~1.15<-10,10>"
+								KV = "~0.25<-10,10>"
+								P0 = "~-0.105<-1,1>"
+							}
+							MuscleReflex {
+								target = iliopsoas
+								source = hamstrings
+								allow_neg_L = 0
+								delay = 0.005
+								KL = "~-4.0<-10,10>"
+								L0 = "~0.85<0,2>"
+							}
+							MuscleReflex {
+								target = hamstrings
+								delay = 0.005
+								KF = "~0.65<-10,10>"
+							}
+							MuscleReflex {
+								target = glut_max
+								delay = 0.005
+								KF = "~0.4<-10,10>"
+							}
+						}
+					}
+				}
+			}
+			ReflexController {
+				name = hip_joints_comp
+				DofReflex {
+					target = pelvis_list
+					source = pelvis_list
+					delay = 0.005
+					KP = "~380<0,400>"
+					KV = "~27<0,50>"
+					C0 = "~0.12<-1,1>"
+				}
+				DofReflex {
+					target = pelvis_rotation
+					source = pelvis_rotation
+					delay = 0.005
+					KP = "~41<0,100>"
+					KV = "~9<0,20>"
+					C0 = "~0.05<-1,1>"
+				}
+				DofReflex {
+					target = hip_adduction
+					source = hip_adduction
+					delay = 0.005
+					KP = "~1800<0,2000>"
+					KV = "~7<0,10>"
+					C0 = "~0.05<-1,1>"
+				}
+			}
+		}
+		CompositeMeasure {
+			GaitMeasure {
+				name = Gait
+				weight = 100
+				threshold = 0.05
+				termination_height = 0.85
+				min_velocity = 1.0
+			}
+			EffortMeasure {
+				name = Effort
+				weight = 0.1
+				measure_type = Wang2012
+				use_cost_of_transport = 1
+			}
+			CompositeMeasure {
+				name = DofLimits
+				symmetric = 1
+				DofMeasure {
+					weight = 0.1
+					dof = ankle_angle
+					position { min = -60 max = 60 squared_penalty = 1 }
+				}
+				DofMeasure {
+					weight = 0.01
+					threshold = 5
+					dof = knee_angle
+					force { min = 0 max = 0 abs_penalty = 1 }
+				}
+			}
+		}
+	}
+	output_root = "/home/fducret/scone/temp"
+}
